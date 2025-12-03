@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTTP client</title>
+</head>
+
+<body>
+    <main>
+        <h1>HTTP client</h1>
+        <form id="form">
+            <label>Method <input name="method" /></label>
+            <label>URI <input name="uri" /></label>
+            <label>Header <textarea name="header" style="resize: none; width: 100%;" rows="10"></textarea></label>
+            <label>Body <textarea name="body" style="resize: none; width: 100%;" rows="10"></textarea></label>
+            <button>Send</button>
+            <p id="form.message" style="color: red;"></p>
+        </form>
+        <pre id="result"></pre>
+    </main>
+</body>
+
+<script type="module">
+    const formElement = document.getElementById("form");
+    const formMessageElement = document.getElementById(
+        "form.message"
+    );
+    const resultElement = document.getElementById("result")
+
+    formElement.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        resultElement.innerText = "";
+        formMessageElement.innerText = "";
+
+        const formData = new FormData(formElement);
+        const method = formData.get("method");
+        const uri = formData.get("uri");
+        const header = formData.get("header");
+        const body = formData.get("body");
+
+        let headerFields
+        try {
+            headerFields = parseHeaderValue(header);
+        } catch (e) {
+            formMessageElement.innerText = e.message;
+            return
+        }
+
+        const requestBodyJSONObject = {
+            method: method,
+            uri: uri,
+            header_fields: headerFields,
+            body: body
+        };
+        const requestBody = JSON.stringify(requestBodyJSONObject);
+
+        const response = await fetch("/", {
+            method: "POST",
+            body: requestBody
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log(result)
+            let output = ""
+            output += result.status;
+            output += "\n\n"
+            for (let i = 0; i < result.header_fields.length; i += 2) {
+                output += result.header_fields[i];
+                output += ": "
+                output += result.header_fields[i + 1];
+                output += "\n"
+            }
+            output += "\n"
+            output += result.body
+            resultElement.innerText = output;
+        } else {
+            const result = await response.json();
+            formMessageElement.innerText = result.message;
+        }
+    });
+
+    function parseHeaderValue(value) {
+        const headers = []
+        const items = value.split("\n");
+        for (let item of items) {
+            item = item.trim();
+            if (item === "") {
+                continue;
+            }
+            const parts = item.split(":");
+            if (parts.length < 2) {
+                throw new Error("Invalid header field");
+            }
+            headers.push(parts[0], parts.slice(1).join(":"));
+        }
+        return headers;
+    }
+</script>
+
+<style>
+    input,
+    textarea {
+        display: block;
+    }
+</style>
+
+</html>
