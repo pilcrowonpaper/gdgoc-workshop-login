@@ -11,7 +11,6 @@ func (server *serverStruct) signUpAction(username string, password string) (user
 		errorCodeInvalidUsername     = "invalid_username"
 		errorCodeInvalidPassword     = "invalid_password"
 		errorCodeUsernameAlreadyUsed = "username_already_used"
-		errorCodeIncorrectPassword   = "incorrect_password"
 	)
 
 	usernameValid := verifyUsernamePattern(username)
@@ -45,6 +44,16 @@ func (server *serverStruct) signInAction(username string, password string) (user
 		errorCodeUserNotFound      = "user_not_found"
 		errorCodeRateLimited       = "rate_limited"
 	)
+
+	usernameValid := verifyUsernamePattern(username)
+	if !usernameValid {
+		return userStruct{}, errorCodeInvalidUsername
+	}
+
+	passwordValid := verifyUserPasswordPattern(password)
+	if !passwordValid {
+		return userStruct{}, errorCodeInvalidPassword
+	}
 
 	user, err := server.getUserByUsername(username)
 	if errors.Is(err, errUserNotFound) {

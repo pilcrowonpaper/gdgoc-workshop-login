@@ -6,7 +6,6 @@ func (server *serverStruct) signUpAction(username string, password string) (user
 		errorCodeInvalidUsername     = "invalid_username"
 		errorCodeInvalidPassword     = "invalid_password"
 		errorCodeUsernameAlreadyUsed = "username_already_used"
-		errorCodeIncorrectPassword   = "incorrect_password"
 	)
 
 	// TODO

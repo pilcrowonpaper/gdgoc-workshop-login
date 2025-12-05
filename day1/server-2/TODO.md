@@ -39,6 +39,16 @@ func (server *serverStruct) signInAction(username string, password string) (user
 		errorCodeRateLimited       = "rate_limited"
 	)
 
+	usernameValid := verifyUsernamePattern(username)
+	if !usernameValid {
+		return userStruct{}, errorCodeInvalidUsername
+	}
+
+	passwordValid := verifyUserPasswordPattern(password)
+	if !passwordValid {
+		return userStruct{}, errorCodeInvalidPassword
+	}
+
 	user, err := server.getUserByUsername(username)
 	if errors.Is(err, errUserNotFound) {
 		return userStruct{}, errorCodeUserNotFound

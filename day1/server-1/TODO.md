@@ -6,7 +6,7 @@
 
 ```go
 func verifyUserPasswordPattern(password string) bool {
-	return len(password) >= 10
+	return len(password) >= 10 && len(password) <= 100
 }
 ```
 

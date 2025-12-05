@@ -11,7 +11,6 @@ func (server *serverStruct) signUpAction(username string, password string) (user
 		errorCodeInvalidUsername     = "invalid_username"
 		errorCodeInvalidPassword     = "invalid_password"
 		errorCodeUsernameAlreadyUsed = "username_already_used"
-		errorCodeIncorrectPassword   = "incorrect_password"
 	)
 
 	usernameValid := verifyUsernamePattern(username)
@@ -39,8 +38,6 @@ func (server *serverStruct) signUpAction(username string, password string) (user
 func (server *serverStruct) signInAction(username string, password string) (userStruct, string) {
 	const (
 		errorCodeUnexpectedError   = "unexpected_error"
-		errorCodeInvalidUsername   = "invalid_username"
-		errorCodeInvalidPassword   = "invalid_password"
 		errorCodeIncorrectPassword = "incorrect_password"
 		errorCodeUserNotFound      = "user_not_found"
 		errorCodeRateLimited       = "rate_limited"

@@ -15,9 +15,8 @@ import (
 var pageHTML []byte
 
 type serverStruct struct {
-	conn                          *sqlite.Conn
-	passwordHashingSemaphore      *semaphore.Weighted
-	passwordVerificationRateLimit *rateLimitStruct
+	conn                     *sqlite.Conn
+	passwordHashingSemaphore *semaphore.Weighted
 }
 
 func (server *serverStruct) ServeHTTP(w http.ResponseWriter, r *http.Request) {

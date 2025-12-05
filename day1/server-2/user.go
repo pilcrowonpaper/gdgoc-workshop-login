@@ -30,7 +30,7 @@ func verifyUsernamePattern(username string) bool {
 }
 
 func verifyUserPasswordPattern(password string) bool {
-	return len(password) >= 10
+	return len(password) >= 10 && len(password) <= 100
 }
 
 var errUsernameAlreadyUsed = errors.New("username already used")
