@@ -1,0 +1,150 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Password authentication</title>
+</head>
+
+<body>
+    <h1>Password authentication demo</h1>
+    <section>
+        <h2>Sign up</h2>
+        <form id="sign-up-form">
+            <label for="sign-up-form.username">Username</label>
+            <input id="sign-up-form.username" name="username"><br>
+            <label for="sign-up-form.password">Password</label>
+            <input id="sign-up-form.password" name="password"><br>
+            <button>Send</button>
+        </form>
+        <section>
+            <h3>Result</h3>
+            <p id="sign-up-idle-result">None.</p>
+            <p id="sign-up-loading-result" hidden>Loading...</p>
+            <div id="sign-up-error-result" hidden>
+                <p id="sign-up-error-result.error-code"></p>
+            </div>
+            <div id="sign-up-success-result" hidden>
+                <p id="sign-up-success-result.id"></p>
+                <p id="sign-up-success-result.username"></p>
+            </div>
+        </section>
+    </section>
+</body>
+
+</html>
+
+<script type="module">
+    "use strict";
+
+    document.getElementById("sign-up-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        document.getElementById("sign-up-idle-result").hidden = true;
+        document.getElementById("sign-up-loading-result").hidden = false;
+        document.getElementById("sign-up-error-result").hidden = true;
+        document.getElementById("sign-up-success-result").hidden = true;
+
+        const formData = new FormData(e.target);
+        const username = formData.get("username");
+        const password = formData.get("password");
+        const argumentsJSONObject = {
+            username: username,
+            password: password
+        };
+
+        const result = await sendActionInvocationRequest("sign_up", argumentsJSONObject);
+        document.getElementById("sign-up-loading-result").hidden = true;
+        if (result.ok) {
+            document.getElementById("sign-up-success-result.id").innerText = `ID: ${result.values.user.id}`;
+            document.getElementById("sign-up-success-result.username").innerText = `Username: ${result.values.user.username}`;
+            document.getElementById("sign-up-success-result").hidden = false;
+        } else {
+            document.getElementById("sign-up-error-result.error-code").innerText = `Error: ${result.errorCode}`;
+            document.getElementById("sign-up-error-result").hidden = false;
+        }
+    });
+
+    async function sendActionInvocationRequest(action, argumentsJSONObject) {
+        const bodyJSONObject = {
+            action: action,
+            arguments: argumentsJSONObject
+        };
+        const bodyJSON = JSON.stringify(bodyJSONObject);
+
+        const request = new Request("/action", {
+            method: "POST",
+            body: bodyJSON
+        });
+        request.headers.set("Content-Type", "application/json; charset=utf-8");
+        const response = await fetch(request);
+        if (!response.ok) {
+            await response.body.cancel();
+            throw new Error(`Server responded with status ${response.status}`);
+        }
+        const resultJSONObject = await response.json();
+        if (!resultJSONObject.ok) {
+            const result = {
+                ok: false,
+                errorCode: resultJSONObject.error_code
+            };
+            return result;
+        }
+        const result = {
+            ok: true,
+            values: resultJSONObject.values
+        };
+        return result;
+    }
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+        border: none;
+        appearance: none;
+        font-size: 1rem;
+        font-family: "SF Mono", "Operator Mono", "Roboto Mono", "Menlo", "Monaco",
+            "Consolas", monospace;
+    }
+
+    html {
+        padding: 2rem;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin: 1.5rem 0rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        margin: 1rem 0rem;
+    }
+
+    label {
+        display: block;
+    }
+
+    input {
+        display: block;
+        border: solid 1px black;
+        padding: 0.5rem;
+        width: 20rem;
+    }
+
+    button {
+        display: block;
+        color: white;
+        background-color: black;
+        padding: 0.5rem;
+        width: 20rem;
+    }
+</style>
