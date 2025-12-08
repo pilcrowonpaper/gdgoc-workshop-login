@@ -41,6 +41,8 @@ func (server *serverStruct) signInAction(username string, password string) (user
 		errorCodeIncorrectPassword = "incorrect_password"
 		errorCodeUserNotFound      = "user_not_found"
 		errorCodeRateLimited       = "rate_limited"
+		errorCodeInvalidUsername   = "invalid_username"
+		errorCodeInvalidPassword   = "invalid_password"
 	)
 
 	// TODO

@@ -58,11 +58,6 @@ func (server *serverStruct) signInAction(username string, password string) (user
 		return userStruct{}, errorCodeUnexpectedError
 	}
 
-	rateLimitAllowed := server.passwordVerificationRateLimit.check(user.id)
-	if !rateLimitAllowed {
-		return userStruct{}, errorCodeRateLimited
-	}
-
 	passwordCorrect := server.verifyUserPassword(password, user.passwordHash, user.passwordSalt)
 	if !passwordCorrect {
 		return userStruct{}, errorCodeIncorrectPassword

@@ -63,9 +63,8 @@ func main() {
 		}
 
 		server := &serverStruct{
-			conn:                          conn,
-			passwordHashingSemaphore:      semaphore.NewWeighted(int64(runtime.NumCPU())),
-			passwordVerificationRateLimit: newRateLimit(5),
+			conn:                     conn,
+			passwordHashingSemaphore: semaphore.NewWeighted(int64(runtime.NumCPU())),
 		}
 
 		fmt.Printf("Starting server at port %d...\n", port)
