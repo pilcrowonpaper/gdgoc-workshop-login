@@ -1,0 +1,285 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Password authentication</title>
+</head>
+
+<body>
+    <h1>Password authentication demo</h1>
+    <section>
+        <h2>Sign up</h2>
+        <form id="sign-up-form">
+            <label for="sign-up-form.username">Username</label>
+            <input id="sign-up-form.username" name="username"><br>
+            <label for="sign-up-form.password">Password</label>
+            <input id="sign-up-form.password" name="password"><br>
+            <button>Send</button>
+        </form>
+        <section>
+            <h3>Result</h3>
+            <p id="sign-up-idle-result">None.</p>
+            <p id="sign-up-loading-result" hidden>Loading...</p>
+            <div id="sign-up-error-result" hidden>
+                <p id="sign-up-error-result.error-code"></p>
+            </div>
+            <div id="sign-up-success-result" hidden>
+                <p id="sign-up-success-result.id"></p>
+                <p id="sign-up-success-result.username"></p>
+                <p id="sign-up-success-result.session-token"></p>
+            </div>
+        </section>
+    </section>
+    <section>
+        <h2>Sign in</h2>
+        <form id="sign-in-form">
+            <label for="sign-in-form.username">Username</label>
+            <input id="sign-in-form.username" name="username"><br>
+            <label for="sign-in-form.password">Password</label>
+            <input id="sign-in-form.password" name="password"><br>
+            <button>Send</button>
+        </form>
+        <section>
+            <h3>Result</h3>
+            <p id="sign-in-idle-result">None.</p>
+            <p id="sign-in-loading-result" hidden>Loading...</p>
+            <div id="sign-in-error-result" hidden>
+                <p id="sign-in-error-result.error-code"></p>
+            </div>
+            <div id="sign-in-success-result" hidden>
+                <p id="sign-in-success-result.id"></p>
+                <p id="sign-in-success-result.username"></p>
+                <p id="sign-in-success-result.session-token"></p>
+            </div>
+        </section>
+    </section>
+    <section>
+        <h2>Get user</h2>
+        <button id="get-user-button">Send</button>
+        <section>
+            <h3>Result</h3>
+            <p id="get-user-idle-result">None.</p>
+            <p id="get-user-loading-result" hidden>Loading...</p>
+            <div id="get-user-error-result" hidden>
+                <p id="get-user-error-result.error-code"></p>
+            </div>
+            <div id="get-user-success-result" hidden>
+                <p id="get-user-success-result.id"></p>
+                <p id="get-user-success-result.username"></p>
+            </div>
+        </section>
+    </section>
+    <section>
+        <h2>Sign out</h2>
+        <button id="sign-out-button">Send</button>
+        <section>
+            <h3>Result</h3>
+            <p id="sign-out-idle-result">None.</p>
+            <p id="sign-out-loading-result" hidden>Loading...</p>
+            <div id="sign-out-error-result" hidden>
+                <p id="sign-out-error-result.error-code"></p>
+            </div>
+            <div id="sign-out-success-result" hidden>
+                <p>Signed out.</p>
+            </div>
+        </section>
+
+    </section>
+</body>
+
+</html>
+
+<script type="module">
+    "use strict";
+
+    document.getElementById("sign-up-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        document.getElementById("sign-up-idle-result").hidden = true;
+        document.getElementById("sign-up-loading-result").hidden = false;
+        document.getElementById("sign-up-error-result").hidden = true;
+        document.getElementById("sign-up-success-result").hidden = true;
+
+        const formData = new FormData(e.target);
+        const username = formData.get("username");
+        const password = formData.get("password");
+        const argumentsJSONObject = {
+            username: username,
+            password: password
+        };
+
+        const result = await sendActionInvocationRequest("sign_up", argumentsJSONObject);
+        document.getElementById("sign-up-loading-result").hidden = true;
+        if (result.ok) {
+            document.getElementById("sign-up-success-result.id").innerText = `ID: ${result.values.user.id}`;
+            document.getElementById("sign-up-success-result.username").innerText = `Username: ${result.values.user.username}`;
+            document.getElementById("sign-up-success-result.session-token").innerText = `Session token: ${result.values.session_token}`;
+            document.getElementById("sign-up-success-result").hidden = false;
+
+            localStorage.setItem("session_token", result.values.session_token);
+        } else {
+            document.getElementById("sign-up-error-result.error-code").innerText = `Error: ${result.errorCode}`;
+            document.getElementById("sign-up-error-result").hidden = false;
+        }
+    });
+
+    document.getElementById("sign-in-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        document.getElementById("sign-in-idle-result").hidden = true;
+        document.getElementById("sign-in-loading-result").hidden = false;
+        document.getElementById("sign-in-error-result").hidden = true;
+        document.getElementById("sign-in-success-result").hidden = true;
+
+        const formData = new FormData(e.target);
+        const username = formData.get("username");
+        const password = formData.get("password");
+        const argumentsJSONObject = {
+            username: username,
+            password: password
+        };
+
+        const result = await sendActionInvocationRequest("sign_in", argumentsJSONObject);
+        document.getElementById("sign-in-loading-result").hidden = true;
+        if (result.ok) {
+            document.getElementById("sign-in-success-result.id").innerText = `ID: ${result.values.user.id}`;
+            document.getElementById("sign-in-success-result.username").innerText = `Username: ${result.values.user.username}`;
+            document.getElementById("sign-in-success-result.session-token").innerText = `Session token: ${result.values.session_token}`;
+            document.getElementById("sign-in-success-result").hidden = false;
+
+            localStorage.setItem("session_token", result.values.session_token);
+        } else {
+            document.getElementById("sign-in-error-result.error-code").innerText = `Error: ${result.errorCode}`;
+            document.getElementById("sign-in-error-result").hidden = false;
+        }
+    });
+
+    document.getElementById("get-user-button").addEventListener("click", async (e) => {
+        document.getElementById("get-user-idle-result").hidden = true;
+        document.getElementById("get-user-loading-result").hidden = false;
+        document.getElementById("get-user-error-result").hidden = true;
+        document.getElementById("get-user-success-result").hidden = true;
+
+        const sessionToken = localStorage.getItem("session_token") ?? "";
+        const argumentsJSONObject = {
+            session_token: sessionToken,
+        };
+
+        const result = await sendActionInvocationRequest("get_user", argumentsJSONObject);
+        document.getElementById("get-user-loading-result").hidden = true;
+        if (result.ok) {
+            document.getElementById("get-user-success-result.id").innerText = `ID: ${result.values.user.id}`;
+            document.getElementById("get-user-success-result.username").innerText = `Username: ${result.values.user.username}`;
+            document.getElementById("get-user-success-result").hidden = false;
+        } else {
+            document.getElementById("get-user-error-result.error-code").innerText = `Error: ${result.errorCode}`;
+            document.getElementById("get-user-error-result").hidden = false;
+        }
+    });
+
+    document.getElementById("sign-out-button").addEventListener("click", async (e) => {
+        document.getElementById("sign-out-idle-result").hidden = true;
+        document.getElementById("sign-out-loading-result").hidden = false;
+        document.getElementById("sign-out-error-result").hidden = true;
+        document.getElementById("sign-out-success-result").hidden = true;
+
+        const sessionToken = localStorage.getItem("session_token") ?? "";
+        const argumentsJSONObject = {
+            session_token: sessionToken,
+        };
+
+        const result = await sendActionInvocationRequest("sign_out", argumentsJSONObject);
+        document.getElementById("sign-out-loading-result").hidden = true;
+        if (result.ok) {
+            document.getElementById("sign-out-success-result").hidden = false;
+        } else {
+            document.getElementById("sign-out-error-result.error-code").innerText = `Error: ${result.errorCode}`;
+            document.getElementById("sign-out-error-result").hidden = false;
+        }
+    });
+
+
+    async function sendActionInvocationRequest(action, argumentsJSONObject) {
+        const bodyJSONObject = {
+            action: action,
+            arguments: argumentsJSONObject
+        };
+        const bodyJSON = JSON.stringify(bodyJSONObject);
+
+        const request = new Request("/action", {
+            method: "POST",
+            body: bodyJSON
+        });
+        request.headers.set("Content-Type", "application/json; charset=utf-8");
+        const response = await fetch(request);
+        if (!response.ok) {
+            await response.body.cancel();
+            throw new Error(`Server responded with status ${response.status}`);
+        }
+        const resultJSONObject = await response.json();
+        if (!resultJSONObject.ok) {
+            const result = {
+                ok: false,
+                errorCode: resultJSONObject.error_code
+            };
+            return result;
+        }
+        const result = {
+            ok: true,
+            values: resultJSONObject.values
+        };
+        return result;
+    }
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+        border: none;
+        appearance: none;
+        font-size: 1rem;
+        font-family: "SF Mono", "Operator Mono", "Roboto Mono", "Menlo", "Monaco",
+            "Consolas", monospace;
+    }
+
+    html {
+        padding: 2rem;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin: 1.5rem 0rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        margin: 1rem 0rem;
+    }
+
+    label {
+        display: block;
+    }
+
+    input {
+        display: block;
+        border: solid 1px black;
+        padding: 0.5rem;
+        width: 20rem;
+    }
+
+    button {
+        display: block;
+        color: white;
+        background-color: black;
+        padding: 0.5rem;
+        width: 20rem;
+    }
+</style>
